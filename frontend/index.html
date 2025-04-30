@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Money Tracker</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start p-4">
+
+  <h1 class="text-2xl font-bold mb-4 text-center">💰 Money Tracker</h1>
+
+  <form id="transaction-form" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md">
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">Amount</label>
+      <input id="amount" type="number" step="0.01" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required>
+    </div>
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Description</label>
+      <input id="description" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" placeholder="What for?">
+    </div>
+    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      Save
+    </button>
+  </form>
+
+  <div id="message" class="text-green-600 font-medium hidden">✅ Transaction saved!</div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // full height
+
+    document.getElementById('transaction-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const amount = parseFloat(document.getElementById('amount').value);
+      const description = document.getElementById('description').value;
+
+      const telegram_id = tg.initDataUnsafe?.user?.id;
+      const username = tg.initDataUnsafe?.user?.username || '';
+      const full_name = tg.initDataUnsafe?.user?.first_name + ' ' + (tg.initDataUnsafe?.user?.last_name || '');
+
+      const payload = {
+        telegram_id,
+        username,
+        full_name,
+        amount,
+        description
+      };
+
+      try {
+        const res = await fetch('https://localhost/transaction/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          document.getElementById('message').classList.remove('hidden');
+        } else {
+          alert('❌ Something went wrong');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('❌ Network error');
+      }
+    });
+  </script>
+
+</body>
+</html>
