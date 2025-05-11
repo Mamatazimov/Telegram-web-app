@@ -6,6 +6,10 @@ async def get_user_by_telegram_id(db: AsyncSession, telegram_id: int):
     result = await db.execute(select(models.User).where(models.User.telegram_id == telegram_id))
     return result.scalars().first()
 
+async def get_transactions(db: AsyncSession, user_id: int):
+    result = await db.execute(select(models.Transaction).where(models.Transaction.user_id == user_id))
+    return result.scalars().all()
+
 async def create_user(db: AsyncSession, user: schemas.UserCreate):
     db_user = models.User(
         telegram_id=user.telegram_id,

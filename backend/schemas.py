@@ -8,8 +8,9 @@ class TransactionType(str, Enum):
 
 class UserCreate(BaseModel):
     telegram_id: int
-    username: Optional[str]
-    full_name: Optional[str]
+    username: Optional[str] | None = None
+    full_name: Optional[str] | None = None
+    
 
 class TransactionCreate(BaseModel):
     type: TransactionType
